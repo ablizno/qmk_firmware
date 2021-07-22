@@ -1,0 +1,1 @@
+# The default Preonic layout with modifications to fix right shift/enter, rgb adjustments. Removed alt layouts to provide a numpad layer.
