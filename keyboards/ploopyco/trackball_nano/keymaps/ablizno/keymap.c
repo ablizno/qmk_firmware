@@ -24,8 +24,32 @@
 
 // placeholder file so it will compile
 
-void keyboard_pre_init_user() {
-    PloopyAcceleration = true;
-    PloopyNumlockScroll = true;
-    PloopyNumlockScrollVDir = -1;
+uint8_t lock_state = 0;
+int16_t delta_x = 0;
+int16_t delta_y = 0;
+
+void keyboard_post_init_user(void) {
+lock_state = host_keyboard_led_state().num_lock; }
+
+bool led_update_user(led_t led_state) { if (led_state.num_lock != lock_state) { delta_x = 0; delta_y = 0; } lock_state = led_state.num_lock; return true; }
+
+void process_mouse_user(report_mouse_t *mouse_report, int16_t x, int16_t y) {
+    if (lock_state == 1) { 
+        delta_x += x; delta_y += y;
+        
+        if (delta_x > 60) { 
+            mouse_report->h = 1; delta_x = 0; 
+        }
+        else if (delta_x < -60) {
+            mouse_report->h = -1; delta_x = 0; 
+        }
+        if (delta_y > 15) { 
+            mouse_report->v = -1; delta_y = 0; 
+        }
+        else if (delta_y < -15) { 
+            mouse_report->v = 1; delta_y = 0; 
+        } 
+    }
+    else { mouse_report->x = x; mouse_report->y = y; 
+    } 
 }
